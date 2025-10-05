@@ -1,0 +1,221 @@
+.movie__edit {
+  display: flex;
+  align-items: center;
+  gap: none;
+  text-decoration: none;
+  font-weight: 600;
+  color: inherit;
+  margin-left: 1rem;
+}
+
+.movie__edit:hover {
+  color: var(--accent-color);
+}
+
+.movie__edit span svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  --pencil-stroke: var(--text-dark);
+  --pencil-fill-eraser: none;
+  --pencil-fill-ferrule: none;
+  --pencil-fill-body: none;
+  --pencil-fill-wood: none;
+  --pencil-fill-tip: none;
+}
+
+.movie__edit:hover span svg {
+  --pencil-fill-eraser: var(--pencil-color-eraser);
+  --pencil-fill-ferrule: var(--pencil-color-metal);
+  --pencil-fill-body:   var(--pencil-color-wood);
+  --pencil-fill-wood:   var(--pencil-color-wood-tip, #FDE68A);
+  --pencil-fill-tip:    var(--pencil-color-graphite, #4B5563);
+}
+
+
+
+.container {
+  max-width: 50rem;
+  margin: 0 auto;
+}
+
+.movie__header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2.5rem;
+}
+
+.header__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.movie__name {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: none;
+}
+
+.movie__title {
+    display: inline-flex;          /* o flex si quieres que ocupe todo el ancho */
+    flex-wrap: wrap;               /* permite que el título ocupe varias líneas */
+    align-items: baseline;         /* alinea la línea base del año con la última del título */
+    gap: 0.4rem;                   /* espacio regular entre texto y año */
+    margin: 0;
+}
+
+.movie__title-text {
+    flex: 1 1 auto;    /* se expande y permite wraps */
+    min-width: 0;      /* evita overflow raro en flex */
+}
+
+.movie__title-year {
+    flex: 0 0 auto;           /* evita que el año se expanda */
+    white-space: nowrap;      /* mantiene el año en una sola pieza */
+    font-size: 0.85em;        /* opcional, para que se vea más pequeño */
+    color: var(--text-muted); /* ajusta a tu paleta */
+}
+
+.movie__year {
+  font-weight: 400;
+  color: var(--text);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  margin-left: 0.5rem;
+}
+
+.movie__rating {
+  margin: 0 0.5rem 2rem 0;
+  display: flex;
+}
+
+.movie__rating:not(:hover):not(:focus-within) .star.filled {
+    fill: var(--accent-color);
+    stroke: var(--accent-color);
+}
+
+.rating__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;      /* ajusta el número a tu gusto */
+    margin: 0;           /* elimina cualquier margen previo */
+    cursor: pointer;     /* pequeño extra de UX */
+}
+
+.movie__rating:hover .star,
+.movie__rating:focus-within .star {
+    fill: var(--accent-color);
+    stroke: var(--accent-color);
+}
+
+.rating__link:hover ~ .rating__link .star,
+.rating__link:focus-within ~ .rating__link .star {
+    fill: transparent;
+    stroke: #ccc;
+}
+
+
+
+.star {
+    width: 24px;
+    height: 24px;
+    fill: transparent;
+    stroke: #ccc;
+    stroke-width: 2;
+    transition: fill 0.2s ease-in-out, stroke 0.3s ease-in-out;
+}
+
+.star:hover {
+  fill: var(--accent-color);
+}
+
+.star.filled {
+    fill: var(--accent-color); /* color of the filled star */
+    stroke: var(--accent-color); /* color of the filled star border */
+}
+
+.movie__watched {
+  display: flex;
+}
+
+.watched__link {
+  color: inherit;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.watched__link:hover {
+  color: var(--accent-color);
+}
+
+.movie__tags {
+  display: flex;
+  list-style: none;
+}
+.movie__tag {
+  background-color: var(--tag-color);
+  padding: 3px 8px;
+}
+
+.movie__tag:not(:first-of-type) {
+  margin-left: 1rem;
+}
+
+.movie__video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 2.5rem;
+  box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.25), 0 15px 35px 0 rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+}
+
+.movie__description {
+  margin: 1.5rem 0;
+
+}
+
+.movie__meta {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.list__item {
+  margin-top: 1rem;
+}
+
+.movie__image {
+    width: 200px; /* La imagen ocupará el 100% de la columna */
+    height: 300px; /* Ajusta la altura según sea necesario */
+    display: block;
+    border-radius: 5px;
+}
+
+
+
+.movie__castCrew {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;          /* aumenta o reduce según NECESITES */
+}
+
+
+
+/*.movie__description--details {
+  max-width: 20em;
+}*/
+
+.list__item {
+  margin-left: 2rem;
+}
+
+.movie__details--grid {
+  display: grid;
+  grid-template-columns: [left-start] minmax(150px, 200px) [left-end] minmax(120px, 1fr) [right-start] 2fr [right-end]; /* Columna 1 (imagen) y 2 (cast) se ajustan a su contenido. Columna 3 (sinopsis) ocupa el espacio restante. */
+  column-gap: 1.5rem; /* Este espaciado grande se aplicará entre todas las columnas. */
+  align-items: start;
+  margin: 0.5rem 0;
+}
+

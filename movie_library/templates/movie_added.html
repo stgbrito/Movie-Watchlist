@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block head_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/movie_added.css') }}" />
+{% endblock %}
+
+{% block main_content %}
+    <div class="container movie-added">
+        <h1 class="movie-added__title">{{ movie.title }} Added Successfully!</h1>
+        <p class="movie-added__message">The movie "{{ movie.title }}" ({{ movie.year }}) by {{ movie.director }} has been added to your watchlist.</p>
+        <a class="button__link" href="{{ url_for('pages.movie', _id=movie._id) }}">&#127909; View Movie Details</a>
+        <a class="button__link" href="{{ url_for('pages.edit_movie', _id=movie._id) }}">&#10133; Add more details</a>
+
+        <a class="button__link" href="{{ url_for('pages.index') }}">&#128281; Back to Watchlist</a>
+    </div>
+{% endblock %}

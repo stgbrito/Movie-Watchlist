@@ -1,0 +1,39 @@
+{% macro sun(class_) %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="{{ class_ }}" viewBox="0 0 24 24">
+  <defs>
+    <radialGradient id="sunRadial" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#FFEB3B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFC107;stop-opacity:1" />
+    </radialGradient>
+    <filter id="sunGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="1.5" flood-color="rgba(255, 255, 255, 0.7)" flood-opacity="1"/>
+    </filter>
+  </defs>
+  <g filter="url(#sunGlow)">
+    <circle cx="12" cy="12" r="6" fill="url(#sunRadial)"/>
+    <path d="M12 1L12 3M12 21L12 23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12L3 12M21 12L23 12M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22"
+          stroke="#FFB000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>
+{% endmacro %}
+
+{% macro moon(class_) %}
+    <svg xmlns="http://www.w3.org/2000/svg" class="{{ class_ }}" viewBox="0 0 24 24">
+  <defs>
+    <linearGradient id="moonLinear" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#B0BEC5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#78909C;stop-opacity:1" />
+    </linearGradient>
+    <filter id="moonShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="0.5" flood-color="rgba(0, 0, 0, 0.2)" flood-opacity="1"/>
+    </filter>
+  </defs>
+  <g filter="url(#moonShadow)">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" fill="url(#moonLinear)" stroke="#546E7A" stroke-width="0.5"/>
+    
+    <path fill="#FFEB3B" d="M17.5 5.5l0.5 1l1 0.5l-1 0.5l-0.5 1l-0.5-1l-1-0.5l1-0.5z"/>
+    <path fill="#FFEB3B" d="M19 12l0.5 1l1 0.5l-1 0.5l-0.5 1l-0.5-1l-1-0.5l1-0.5z" transform="scale(0.8) translate(5, 5)"/>
+  </g>
+</svg>
+{% endmacro %}
+
