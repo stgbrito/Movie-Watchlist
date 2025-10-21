@@ -10,6 +10,15 @@ load_dotenv()
 
 
 def create_app():
+    """
+    Creates and configures the Flask application.
+
+    This function initializes the Flask app, loads configuration from environment
+    variables, connects to the MongoDB database, and registers the blueprints.
+
+    Returns:
+        Flask: The configured Flask application instance.
+    """
     app = Flask(__name__, static_folder="static", template_folder="templates")
     app.config["MONGODB_URI"] = os.environ.get("MONGODB_URI")
     secret_key = os.environ.get("SECRET_KEY")

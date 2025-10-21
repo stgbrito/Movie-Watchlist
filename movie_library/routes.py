@@ -22,6 +22,18 @@ pages = Blueprint(
 )
 
 def login_required(route):
+    """
+    A decorator to ensure a user is logged in before accessing a route.
+
+    If the user is not logged in, they are redirected to the login page.
+
+    Args:
+        route (function): The route to protect.
+
+    Returns:
+        function: The decorated route.
+    """
+
     @functools.wraps(route)
     def route_wrapper(*args, **kwargs):
         if session.get("email") is None:
@@ -35,6 +47,12 @@ def login_required(route):
 @pages.route("/")
 @login_required
 def index():
+    """
+    Renders the user's movie watchlist.
+
+    Returns:
+        str: The rendered HTML of the index page.
+    """
     user_data = current_app.db.user.find_one({"email": session["email"]})
     user = User(**user_data)
 
@@ -49,6 +67,14 @@ def index():
 
 @pages.route("/register", methods=["GET", "POST"])
 def register():
+    """
+    Renders the registration page and handles user registration.
+
+    If the user is already logged in, they are redirected to the index page.
+
+    Returns:
+        str: The rendered HTML of the registration page.
+    """
     if session.get("email"):
         return redirect(url_for(".index"))
 
@@ -73,6 +99,14 @@ def register():
 
 @pages.route("/login", methods=["GET", "POST"])
 def login():
+    """
+    Renders the login page and handles user login.
+
+    If the user is already logged in, they are redirected to the index page.
+
+    Returns:
+        str: The rendered HTML of the login page.
+    """
     if session.get("email"):
         return redirect(url_for(".index"))
 
@@ -99,6 +133,12 @@ def login():
 
 @pages.route("/logout")
 def logout():
+    """
+    Logs the user out and redirects to the login page.
+
+    Returns:
+        werkzeug.utils.redirect: A redirect to the login page.
+    """
     current_theme = session.get("theme")
     session.clear()
     session["theme"] = current_theme
@@ -111,6 +151,12 @@ def logout():
 @pages.route("/add", methods=["GET", "POST"])
 @login_required
 def add_movie():
+    """
+    Renders the add movie page and handles adding a new movie.
+
+    Returns:
+        str: The rendered HTML of the add movie page.
+    """
     form = MovieForm()
 
     if form.validate_on_submit():
@@ -138,6 +184,15 @@ def add_movie():
 
 @pages.route("/added/<string:_id>")
 def movie_added(_id: str):
+    """
+    Renders a confirmation page after a movie has been added.
+
+    Args:
+        _id (str): The ID of the movie that was added.
+
+    Returns:
+        str: The rendered HTML of the movie added page.
+    """
     movie = Movie(**current_app.db.movie.find_one({"_id": _id}))
     return render_template("movie_added.html", movie=movie)
 
@@ -145,9 +200,21 @@ def movie_added(_id: str):
 @pages.route("/edit/<string:_id>", methods=["GET", "POST"])
 @login_required
 def edit_movie(_id: str):
+    """
+    Renders the edit movie page and handles editing a movie.
+
+    Args:
+        _id (str): The ID of the movie to edit.
+
+    Returns:
+        str: The rendered HTML of the edit movie page.
+    """
     movie = Movie(**current_app.db.movie.find_one({"_id": _id}))
     form = ExtendedMovieForm(obj=movie)
     if form.validate_on_submit():
+        movie.title = form.title.data
+        movie.director = form.director.data
+        movie.year = form.year.data
         movie.cast = form.cast.data
         movie.series = form.series.data
         movie.tags = form.tags.data
@@ -163,6 +230,15 @@ def edit_movie(_id: str):
 
 @pages.get("/movie/<string:_id>")
 def movie(_id: str):
+    """
+    Renders the movie details page.
+
+    Args:
+        _id (str): The ID of the movie to display.
+
+    Returns:
+        str: The rendered HTML of the movie details page.
+    """
     movie = Movie(**current_app.db.movie.find_one({"_id": _id}))
     return render_template(
         "movie_details.html",
@@ -174,6 +250,15 @@ def movie(_id: str):
 @pages.get("/movie/<string:_id>/rate")
 @login_required
 def rate_movie(_id):
+    """
+    Rates a movie and redirects to the movie details page.
+
+    Args:
+        _id (str): The ID of the movie to rate.
+
+    Returns:
+        werkzeug.utils.redirect: A redirect to the movie details page.
+    """
     rating = int(request.args.get("rating"))
     current_app.db.movie.update_one({"_id": _id}, {"$set": {"rating": rating}})
 
@@ -183,6 +268,15 @@ def rate_movie(_id):
 @pages.get("/movie/<string:_id>/watch")
 @login_required
 def watch_today(_id):
+    """
+    Updates the last watched date of a movie to today and redirects to the movie details page.
+
+    Args:
+        _id (str): The ID of the movie to mark as watched.
+
+    Returns:
+        werkzeug.utils.redirect: A redirect to the movie details page.
+    """
     current_app.db.movie.update_one(
         {"_id": _id}, {"$set": {"last_watched": datetime.datetime.today()}}
     )
@@ -192,6 +286,12 @@ def watch_today(_id):
 
 @pages.get("/toggle-theme")
 def toggle_theme():
+    """
+    Toggles the theme between light and dark mode.
+
+    Returns:
+        werkzeug.utils.redirect: A redirect to the current page.
+    """
     current_theme = session.get("theme")
     if current_theme == "dark":
         session["theme"] = "light"
