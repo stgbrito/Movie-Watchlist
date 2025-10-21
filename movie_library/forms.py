@@ -11,6 +11,16 @@ from wtforms.validators import InputRequired, NumberRange, Email, Length, EqualT
 
 
 class MovieForm(FlaskForm):
+    """
+    A form for adding or editing a movie.
+
+    Attributes:
+        title (StringField): The title of the movie.
+        director (StringField): The director of the movie.
+        year (IntegerField): The year the movie was released.
+        submit (SubmitField): The submit button.
+    """
+
     title = StringField("Title", validators=[InputRequired()])
     director = StringField("Director", validators=[InputRequired()])
 
@@ -26,6 +36,10 @@ class MovieForm(FlaskForm):
 
 
 class StringListField(TextAreaField):
+    """
+    A custom field for entering a list of strings, separated by newlines.
+    """
+
     def _value(self):
         if self.data:
             return "\n".join(self.data)
@@ -33,6 +47,12 @@ class StringListField(TextAreaField):
             return ""
 
     def process_formdata(self, valuelist):
+        """
+        Processes the form data and converts it to a list of strings.
+
+        Args:
+            valuelist (list): The list of values from the form.
+        """
         if valuelist and valuelist[0]:
             self.data = [line.strip() for line in valuelist[0].split("\n")]
         else:
@@ -40,6 +60,19 @@ class StringListField(TextAreaField):
 
 
 class ExtendedMovieForm(MovieForm):
+    """
+    An extended form for adding or editing a movie, with additional fields.
+
+    Attributes:
+        cast (StringListField): The cast of the movie.
+        series (StringListField): The series the movie belongs to.
+        tags (StringListField): The tags associated with the movie.
+        description (TextAreaField): The description of the movie.
+        video_link (URLField): The link to the movie's video.
+        image_link (URLField): The link to the movie's image.
+        submit (SubmitField): The submit button.
+    """
+
     cast = StringListField("Cast")
     series = StringListField("Series")
     tags = StringListField("Tags")
@@ -51,6 +84,16 @@ class ExtendedMovieForm(MovieForm):
 
 
 class RegisterForm(FlaskForm):
+    """
+    A form for user registration.
+
+    Attributes:
+        email (StringField): The user's email address.
+        password (PasswordField): The user's password.
+        confirm_password (PasswordField): The user's password confirmation.
+        submit (SubmitField): The submit button.
+    """
+
     email = StringField(
         "Email",
         validators=[InputRequired(), Email()],
@@ -73,6 +116,15 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Register")
 
 class LoginForm(FlaskForm):
+    """
+    A form for user login.
+
+    Attributes:
+        email (StringField): The user's email address.
+        password (PasswordField): The user's password.
+        submit (SubmitField): The submit button.
+    """
+
     email = StringField(
         "Email",
         validators=[InputRequired(), Email()],
