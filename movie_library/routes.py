@@ -12,9 +12,11 @@ from flask import (
     flash,
 )
 from dataclasses import asdict
-from movie_library.forms import MovieForm, ExtendedMovieForm, RegisterForm, LoginForm
+from movie_library.forms import MovieForm, ExtendedMovieForm, RegisterForm, LoginForm, ResetPasswordForm, RequestResetForm, UpdateAccountForm
 from movie_library.models import Movie, User
 from passlib.hash import pbkdf2_sha256
+from flask_mail import Message
+from movie_library import mail
 
 
 pages = Blueprint(
@@ -131,6 +133,38 @@ def login():
     return render_template("login.html", title="Movies Watchlist - Login", form=form)
             
 
+@pages.route("/account", methods=["GET", "POST"])
+@login_required
+def account():
+    """
+    Renders the account page and handles updating user account information.
+    """
+    form = UpdateAccountForm()
+
+    if form.validate_on_submit():
+        user_data = current_app.db.user.find_one({"email": session["email"]})
+        user = User(**user_data)
+
+        # Verify current password
+        if user and pbkdf2_sha256.verify(form.password.data, user.password):
+            # Update email
+            current_app.db.user.update_one(
+                {"_id": user._id},
+                {"$set": {"email": form.email.data}}
+            )
+            # Update session email
+            session["email"] = form.email.data
+
+            flash("Your account has been updated!", "success")
+            return redirect(url_for(".account"))
+        else:
+            flash("Incorrect password. Please try again.", "danger")
+    elif request.method == "GET":
+        # Pre-fill the form with current user data
+        form.email.data = session["email"]
+
+    return render_template("account.html", title="Account", form=form)
+
 @pages.route("/logout")
 def logout():
     """
@@ -145,6 +179,67 @@ def logout():
 
     return redirect(url_for(".login"))
 
+
+def send_reset_email(user):
+    """
+    Sends a password reset email to the user.
+
+    Args:
+        user (User): The user to send the email to.
+    """
+    token = user.get_reset_token()
+    msg = Message(
+        "Password Reset Request",
+        recipients=[user.email],
+    )
+    msg.body = f"""To reset your password, visit the following link:
+{url_for('pages.reset_token', token=token, _external=True)}
+
+If you did not make this request then simply ignore this email and no changes will be made.
+"""
+    mail.send(msg)
+
+
+@pages.route("/reset_request", methods=["GET", "POST"])
+def reset_request():
+    """
+    Renders the page to request a password reset and handles the form submission.
+    """
+    if session.get("email"):
+        return redirect(url_for(".index"))
+    form = RequestResetForm()
+    if form.validate_on_submit():
+        user_data = current_app.db.user.find_one({"email": form.email.data})
+        if user_data:
+            user = User(**user_data)
+            send_reset_email(user)
+        flash("An email has been sent with instructions to reset your password.", "info")
+        return redirect(url_for(".login"))
+    
+    return render_template("reset_request.html", title="Reset Password", form=form)
+
+@pages.route("/reset_request/<token>", methods=["GET", "POST"])
+def reset_token(token):
+    """
+    Renders the page to reset a user's password and handles the form submission.
+    """
+    if session.get("email"):
+        return redirect(url_for(".index"))
+    user = User.verify_reset_token(token)
+    if user is None:
+        flash("That is an invalid or expired token", "warning")
+        return redirect(url_for(".reset_request"))
+    
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        hashed_password = pbkdf2_sha256.hash(form.password.data)
+        current_app.db.user.update_one(
+            {"_id": user._id}, 
+            {"$set": {"password": hashed_password}}
+        )
+        flash("Your password has been updated! You can now log in.", "success")
+        return redirect(url_for(".login"))
+    return render_template("reset_token.html", title="Reset Password", form=form)
 
 
 

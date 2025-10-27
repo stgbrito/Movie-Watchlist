@@ -3,10 +3,13 @@ from datetime import datetime
 from flask import Flask
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from flask_mail import Mail
 
-from movie_library.routes import pages
 
 load_dotenv()
+
+mail = Mail()
+from movie_library.routes import pages
 
 
 def create_app():
@@ -30,6 +33,17 @@ def create_app():
         )
     app.config["SECRET_KEY"] = secret_key
     app.db = MongoClient(app.config["MONGODB_URI"])["movie_watchlist"]
+
+    # Mail configuration
+    app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER")
+    app.config["MAIL_PORT"] = int(os.environ.get("MAIL_PORT"))
+    app.config["MAIL_USE_TLS"] = os.environ.get("MAIL_USE_TLS").lower() in ["true", "on", "1"]
+    app.config["MAIL_USERNAME"] = os.environ.get("MAIL_USERNAME")
+    app.config["MAIL_PASSWORD"] = os.environ.get("MAIL_PASSWORD")
+    app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("MAIL_USERNAME") 
+
+    # Initialize Flask-Mail
+    mail.init_app(app)
 
     @app.context_processor
     def inject_current_year():

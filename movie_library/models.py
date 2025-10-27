@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from itsdangerous import URLSafeTimedSerializer
+from flask import current_app
 
 
 @dataclass
@@ -21,6 +23,7 @@ class Movie:
         video_link (str): A link to the movie's video.
         image_link (str): A link to the movie's image.
     """
+
 
     _id: str
     title: str
@@ -52,3 +55,36 @@ class User:
     email: str
     password: str
     movies: list[str] = field(default_factory=list)  # List of Movie IDs
+
+    def get_reset_token(self, expires_sec=1800):
+        """
+        Generates a password reset token for the user.
+
+        Args:
+            expires_sec (int): The expiration time in seconds. Default is 1800 seconds (30 minutes).
+
+        Returns:
+            str: The generated token.
+        """
+        s = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+        return s.dumps({"user_id": self._id})
+    
+    @staticmethod
+    def verify_reset_token(token):
+        """
+        Verifies a password reset token.
+
+        Args:
+            token (str): The token to verify.
+
+        Returns:
+            str: The user ID associated with the token.
+        """
+        s = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+        try:
+            user_id = s.loads(token, max_age=1800)["user_id"]
+        except:
+            return None
+        return User(**current_app.db.user.find_one({"_id": user_id}))
+    
+

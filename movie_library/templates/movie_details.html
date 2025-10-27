@@ -1,137 +1,154 @@
-{% extends "layout.html" %}
-
-{% block head_content %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/movie_details.css') }}" />
-{% endblock %}
-
-{% block main_content %}
+{% extends "layout.html" %} {% block head_content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/movie_details.css') }}"
+/>
+{% endblock %} {% block main_content %}
 <div class="container">
-    <header class="movie-header">
-        <div class="header__row">
-            <div class="movie__name">
-                <h1 class="movie__title">
-                    <span class="movie__title-text">{{ movie.title }}</span>
-                    <span class="movie__title-year">({{ movie.year }})</span>
-                </h1>
-                
-            </div>
-            <div class="movie__watched">
-                {% if movie.last_watched %}
-                    <p>
-                        Last watched: <a href="{{ url_for('pages.watch_today', _id=movie._id) }}" class="watched__link">
-                            <time datetime="{{ movie.last_watched }}">{{ movie.last_watched.strftime('%d %b %y') }}</time>
-                        </a>
-                    </p>
-                {% else %}
-                    <p><a href="{{ url_for('pages.watch_today', _id=movie._id) }}" class="watched__link">Not watched yet</a></p>
-                {% endif %}
-                <!-- an edit link with an icon of a pencil set as a symbol inside my icons.svg file  --> 
-                <a class="movie__edit" href="{{ url_for('pages.edit_movie', _id=movie._id) }}">
-                    Edit
-                    <span>
-                        <svg>
-                            <use href="{{ url_for('static', filename='img/icons.svg') }}#icon-pencil"></use>
-                        </svg>
-                    </span>
-                </a>
-            </div>
-        </div>
-        <div class="header__row">
-            <ul class="movie__tags">
-            {% for tag in movie.tags %}
-                <li class="movie__tag">{{ tag }}</li>
-            {% endfor %}
-            </ul>
-        </div>
-    </header>
-
-    <div class="movie__details--grid">
-        {% if movie.image_link %}
-            <img 
-                class="movie__image" 
-                src="{{ movie.image_link }}"
-                alt="{{ movie.title }} poster"
-            />
+  <header class="movie-header">
+    <div class="header__row">
+      <div class="movie__name">
+        <h1 class="movie__title">
+          <span class="movie__title-text">{{ movie.title }}</span>
+          <span class="movie__title-year">({{ movie.year }})</span>
+        </h1>
+      </div>
+      <div class="movie__watched">
+        {% if movie.last_watched %}
+        <p>
+          Last watched:
+          <a
+            href="{{ url_for('pages.watch_today', _id=movie._id) }}"
+            class="watched__link"
+          >
+            <time datetime="{{ movie.last_watched }}"
+              >{{ movie.last_watched.strftime('%d %b %y') }}</time
+            >
+          </a>
+        </p>
         {% else %}
-            <img 
-                class="movie__image" 
-                src="{{ url_for('static', filename='img/placeholder.png') }}"
-                alt="{{ movie.title }} poster placeholder"
-            />
+        <p>
+          <a
+            href="{{ url_for('pages.watch_today', _id=movie._id) }}"
+            class="watched__link"
+            >Not watched yet</a
+          >
+        </p>
         {% endif %}
-
-        <div class="movie__castCrew">
-            {% if movie.director %}
-                <div class="movie__director">
-                    <h2>Director</h2>
-                    <ul class="list">
-                    {% if movie.director is iterable and movie.director is not string %}
-                        {% for director in movie.director %}
-                            <li class="list__item">{{ director }}</li>
-                        {% endfor %}
-                    {% else %}
-                        <li class="list__item">{{ movie.director }}</li>
-                    {% endif %}
-                    </ul>
-                </div>
-            {% endif %}
-            {% if movie.cast %}
-                <div class="movie__casting">
-                    <h2>Cast</h2>
-                    <ul class="list">
-                    {% for actor in movie.cast %}
-                        <li class="list__item">{{ actor }}</li>
-                    {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="movie__description--details">
-            {% if movie.description %}
-                <h2>Synopsis</h2>
-                <p class="movie__description">{{ movie.description }}</p>
-            {% else %}
-                <p class="movie__no--description">No description yet. <a href="#" class="link">Add one?</a></p>
-            {% endif %}
-        </div>
-
-        
-
+        <!-- an edit link with an icon of a pencil set as a symbol inside my icons.svg file  -->
+        <a
+          class="movie__edit"
+          href="{{ url_for('pages.edit_movie', _id=movie._id) }}"
+        >
+          Edit
+          <span>
+            <svg>
+              <use
+                href="{{ url_for('static', filename='img/icons.svg') }}#icon-pencil"
+              ></use>
+            </svg>
+          </span>
+        </a>
+      </div>
     </div>
-
-    <div class="movie__rating">
-        {% for i in range(5) %}
-            <a class="rating__link" href="{{ url_for('pages.rate_movie', _id=movie._id, rating=i+1) }}" >
-                <svg class="star {{ 'filled' if movie.rating > i else '' }}">
-                    <use href="{{ url_for('static', filename='img/icons.svg') }}#icon-star"></use>
-                </svg>
-            </a>
+    <div class="header__row">
+      <ul class="movie__tags">
+        {% for tag in movie.tags %}
+        <li class="movie__tag">{{ tag }}</li>
         {% endfor %}
+      </ul>
+    </div>
+  </header>
+
+  <div class="movie__details--grid">
+    {% if movie.image_link %}
+    <img
+      class="movie__image"
+      src="{{ movie.image_link }}"
+      alt="{{ movie.title }} poster"
+    />
+    {% else %}
+    <img
+      class="movie__image"
+      src="{{ url_for('static', filename='img/placeholder.png') }}"
+      alt="{{ movie.title }} poster placeholder"
+    />
+    {% endif %}
+
+    <div class="movie__castCrew">
+      {% if movie.director %}
+      <div class="movie__director">
+        <h2>Director</h2>
+        <ul class="list">
+          {% if movie.director is iterable and movie.director is not string %}
+          {% for director in movie.director %}
+          <li class="list__item">{{ director }}</li>
+          {% endfor %} {% else %}
+          <li class="list__item">{{ movie.director }}</li>
+          {% endif %}
+        </ul>
+      </div>
+      {% endif %} {% if movie.cast %}
+      <div class="movie__casting">
+        <h2>Cast</h2>
+        <ul class="list">
+          {% for actor in movie.cast %}
+          <li class="list__item">{{ actor }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
     </div>
 
-    {% if movie.video_link %}
-        <iframe 
-            class="movie__video" 
-            src="{{ movie.video_link }}"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowfullscreen
-        ></iframe>
-    {% endif %}
+    <div class="movie__description--details">
+      {% if movie.description %}
+      <h2>Synopsis</h2>
+      <p class="movie__description">{{ movie.description }}</p>
+      {% else %}
+      <p class="movie__no--description">
+        No description yet. <a href="#" class="link">Add one?</a>
+      </p>
+      {% endif %}
+    </div>
+  </div>
 
-    <div class="movie__meta">
-    
+  <div class="movie__rating">
+    {% for i in range(5) %}
+    <a
+      class="rating__link"
+      href="{{ url_for('pages.rate_movie', _id=movie._id, rating=i+1) }}"
+    >
+      <svg class="star {{ 'filled' if movie.rating > i else '' }}">
+        <use
+          href="{{ url_for('static', filename='img/icons.svg') }}#icon-star"
+        ></use>
+      </svg>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if movie.video_link %}
+  <iframe
+    class="movie__video"
+    src="{{ movie.video_link }}"
+    title="YouTube video player"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  ></iframe>
+  {% endif %}
+
+  <div class="movie__meta">
     {% if movie.series | length %}
-        <div class="movie__series">
-            <h2>Series</h2>
-            <ul class="list">
-            {% for movie_in_series in movie.series %}
-                <li class="list__item">{{ movie_in_series }}</li>
-            {% endfor %}
-            </ul>
-        </div>
+    <div class="movie__series">
+      <h2>Series</h2>
+      <ul class="list">
+        {% for movie_in_series in movie.series %}
+        <li class="list__item">{{ movie_in_series }}</li>
+        {% endfor %}
+      </ul>
+    </div>
     {% endif %}
+  </div>
+  {% endblock %}
 </div>
-{% endblock %}

@@ -7,3 +7,4 @@ flask-security
 email_validator
 passlib
 pymongo[srv]
+Flask-Mail==0.9.1

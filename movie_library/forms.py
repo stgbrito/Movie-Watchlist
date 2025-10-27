@@ -7,8 +7,9 @@ from wtforms import (
     URLField,
     PasswordField,
 )
-from wtforms.validators import InputRequired, NumberRange, Email, Length, EqualTo
-
+from wtforms.validators import InputRequired, NumberRange, Email, Length, EqualTo, ValidationError
+from movie_library.models import User
+from flask import current_app, session
 
 class MovieForm(FlaskForm):
     """
@@ -137,3 +138,57 @@ class LoginForm(FlaskForm):
         ],
     )
     submit = SubmitField("Log in")
+
+class RequestResetForm(FlaskForm):
+    """
+    A form for requesting a password reset.
+
+    """
+    email = StringField(
+        "Email",
+        validators=[InputRequired(), Email()],
+        filters=[lambda value: value.strip().lower() if isinstance(value, str) else value],
+    )
+    submit_button = SubmitField("Request Password Reset")
+
+class ResetPasswordForm(FlaskForm):
+    """
+    Form for a user to reset their password after veruifying the token.
+    """
+    password = PasswordField(
+        "New Password",
+        validators=[
+            InputRequired(),
+            Length(min=8, message="Password must be at least 8 characters long."),
+        ],
+    )
+    confirm_password = PasswordField(
+        "Confirm New Password",
+        validators=[
+            InputRequired(),
+            EqualTo("password", message="Passwords must match."),
+        ],
+    )
+    submit_button = SubmitField("Reset Password")
+
+class UpdateAccountForm(FlaskForm):
+    """
+    A form for updating user account information.
+
+    """
+    email = StringField(
+        "Email",
+        validators=[InputRequired(), Email()],
+        filters=[lambda value: value.strip().lower() if isinstance(value, str) else value],
+    )
+    password = PasswordField("Current Password", validators=[InputRequired()])
+    submit_button = SubmitField("Update Account")
+
+    def validate_email(self, email):
+        """
+        Custom validator to ensure the new email isn't already taken by another user.
+        """
+        if email.data != session.get("email"):
+            user_data = current_app.db.users.find_one({"email": email.data})
+            if user_data:
+                raise ValidationError("Email is already in use. Please choose a different one.")
