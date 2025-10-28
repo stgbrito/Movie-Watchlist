@@ -4,6 +4,7 @@ from flask import Flask
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from flask_mail import Mail
+from pymongo.errors import OperationFailure
 
 
 load_dotenv()
@@ -33,6 +34,13 @@ def create_app():
         )
     app.config["SECRET_KEY"] = secret_key
     app.db = MongoClient(app.config["MONGODB_URI"])["movie_watchlist"]
+    try:
+        app.db.user.create_index([("email", 1)], unique=True)
+    except OperationFailure as e:
+        # Posibles duplicados existentes o permisos insuficientes
+        app.logger.warning(f"Could not create unique index on user.email: {e}")
+    except Exception as e:
+        app.logger.warning(f"Unexpected error creating unique index on user.email: {e}")
 
     # Mail configuration
     app.config["MAIL_SERVER"] = os.environ.get("MAIL_SERVER")

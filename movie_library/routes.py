@@ -17,6 +17,7 @@ from movie_library.models import Movie, User
 from passlib.hash import pbkdf2_sha256
 from flask_mail import Message
 from movie_library import mail
+from pymongo.errors import DuplicateKeyError
 
 
 pages = Blueprint(
@@ -89,7 +90,15 @@ def register():
             password=pbkdf2_sha256.hash(form.password.data),
         )
 
-        current_app.db.user.insert_one(asdict(user))
+        if current_app.db.user.find_one({"email": form.email.data}):
+            flash("An account with this email already exists.", category="danger")
+            return redirect(url_for(".register"))
+
+        try:
+            current_app.db.user.insert_one(asdict(user))
+        except DuplicateKeyError:
+            flash("An account with this email already exists.", category="danger")
+            return redirect(url_for(".register"))
 
         flash("User registered successfully!", "success")
 

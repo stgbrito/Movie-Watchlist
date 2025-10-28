@@ -116,6 +116,12 @@ class RegisterForm(FlaskForm):
     )
     submit = SubmitField("Register")
 
+    def validate_email(self, email):
+        """Reject if email already exists (case-insensitive; ya filtras a lower)."""
+        existing = current_app.db.user.find_one({"email": email.data})
+        if existing:
+            raise ValidationError("An account with this email already exists.")
+
 class LoginForm(FlaskForm):
     """
     A form for user login.
@@ -189,6 +195,6 @@ class UpdateAccountForm(FlaskForm):
         Custom validator to ensure the new email isn't already taken by another user.
         """
         if email.data != session.get("email"):
-            user_data = current_app.db.users.find_one({"email": email.data})
+            user_data = current_app.db.user.find_one({"email": email.data})
             if user_data:
                 raise ValidationError("Email is already in use. Please choose a different one.")
